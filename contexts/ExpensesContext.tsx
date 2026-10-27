@@ -6,7 +6,7 @@ import React, {
   useEffect,
   useReducer,
   useMemo,
-  useState,
+  useCallback,
 } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "./AuthContext";
@@ -21,6 +21,7 @@ interface ExpensesState {
   loaded: boolean;
   filterCategory: string;
   filterMonth: string;
+  expenseError: string | null;
 }
 
 type ExpensesAction =
@@ -30,13 +31,15 @@ type ExpensesAction =
   | { type: "REMOVE"; payload: string }
   | { type: "SET_CATEGORY"; payload: string }
   | { type: "SET_MONTH"; payload: string }
-  | { type: "CLEAR_FILTERS" };
+  | { type: "CLEAR_FILTERS" }
+  | { type: "SET_EXPENSE_ERROR"; payload: string | null };
 
 const initialState: ExpensesState = {
   expenses: [],
   loaded: false,
   filterCategory: "",
   filterMonth: "",
+  expenseError: null,
 };
 
 function expensesReducer(state: ExpensesState, action: ExpensesAction): ExpensesState {
@@ -47,6 +50,7 @@ function expensesReducer(state: ExpensesState, action: ExpensesAction): Expenses
         loaded: false,
         filterCategory: "",
         filterMonth: "",
+        expenseError: null,
       };
     case "SET":
       return {
@@ -82,6 +86,11 @@ function expensesReducer(state: ExpensesState, action: ExpensesAction): Expenses
         filterCategory: "",
         filterMonth: "",
       };
+    case "SET_EXPENSE_ERROR":
+      return {
+        ...state,
+        expenseError: action.payload,
+      };
     default:
       return state;
   }
@@ -113,11 +122,13 @@ const ExpensesContext = createContext<ExpensesContextType | undefined>(undefined
 export function ExpensesProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [state, dispatch] = useReducer(expensesReducer, initialState);
-  const [expenseError, setExpenseError] = useState<string | null>(null);
+
+  const setExpenseError = useCallback((err: string | null) => {
+    dispatch({ type: "SET_EXPENSE_ERROR", payload: err });
+  }, []);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
-    setExpenseError(null);
 
     if (!user) {
       return;
@@ -135,7 +146,7 @@ export function ExpensesProvider({ children }: { children: React.ReactNode }) {
       if (!active) return;
 
       if (error) {
-        setExpenseError(error.message);
+        dispatch({ type: "SET_EXPENSE_ERROR", payload: error.message });
         dispatch({ type: "SET", payload: [] });
       } else if (data) {
         const parsed: Expense[] = data.map((item) => ({
@@ -151,7 +162,7 @@ export function ExpensesProvider({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
-  }, [user?.id]);
+  }, [user]);
 
   const setFilterCategory = (category: string) => {
     dispatch({ type: "SET_CATEGORY", payload: category });
@@ -246,7 +257,7 @@ export function ExpensesProvider({ children }: { children: React.ReactNode }) {
         clearFilters,
         addExpense,
         deleteExpense,
-        expenseError,
+        expenseError: state.expenseError,
         setExpenseError,
       }}
     >
