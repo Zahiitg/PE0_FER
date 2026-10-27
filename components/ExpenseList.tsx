@@ -49,10 +49,10 @@ export function ExpenseList() {
               <Card
                 key={expense.id}
                 data-testid="expense-item"
-                className="p-4 flex flex-row items-center justify-between gap-4"
+                className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4"
               >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
+                <div className="min-w-0 flex-1 w-full">
+                  <div className="flex items-center justify-between sm:justify-start gap-2 flex-wrap">
                     <span
                       data-testid="expense-category"
                       className="font-semibold text-foreground text-sm"
@@ -74,7 +74,7 @@ export function ExpenseList() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4 shrink-0">
+                <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0">
                   <span
                     data-testid="expense-amount"
                     className="font-bold text-base whitespace-nowrap"
