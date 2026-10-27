@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import ExpenseForm from "@/components/ExpenseForm";
+import ExpenseList from "@/components/ExpenseList";
 
 export default function ExpensesPage() {
   const { user, loading } = useAuth();
@@ -27,6 +28,7 @@ export default function ExpensesPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
+          <ExpenseList />
         </div>
       </div>
     </div>

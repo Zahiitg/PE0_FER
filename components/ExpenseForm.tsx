@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
 export function ExpenseForm() {
-  const { addExpense } = useExpenses();
+  const { addExpense, setExpenseError } = useExpenses();
 
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
@@ -23,7 +23,6 @@ export function ExpenseForm() {
     note?: string;
   }>({});
 
-  const [errorExpense, setErrorExpense] = useState<string | null>(null);
   const [expenseSuccess, setExpenseSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -31,7 +30,7 @@ export function ExpenseForm() {
     const val = e.target.value;
     setAmount(val);
     setExpenseSuccess(null);
-    setErrorExpense(null);
+    setExpenseError(null);
 
     if (errors.amount) {
       const trimmed = val.trim();
@@ -57,7 +56,7 @@ export function ExpenseForm() {
     const val = e.target.value;
     setCategory(val);
     setExpenseSuccess(null);
-    setErrorExpense(null);
+    setExpenseError(null);
 
     if (errors.category) {
       if (!val) {
@@ -76,7 +75,7 @@ export function ExpenseForm() {
     const val = e.target.value;
     setDate(val);
     setExpenseSuccess(null);
-    setErrorExpense(null);
+    setExpenseError(null);
 
     if (errors.date) {
       const trimmed = val.trim();
@@ -98,7 +97,7 @@ export function ExpenseForm() {
     const val = e.target.value;
     setNote(val);
     setExpenseSuccess(null);
-    setErrorExpense(null);
+    setExpenseError(null);
 
     if (errors.note) {
       if (Array.from(val).length > 100) {
@@ -116,7 +115,7 @@ export function ExpenseForm() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setExpenseSuccess(null);
-    setErrorExpense(null);
+    setExpenseError(null);
 
     const validationErrors = validateExpense({ amount, category, date, note });
     if (Object.keys(validationErrors).length > 0) {
@@ -143,7 +142,7 @@ export function ExpenseForm() {
       });
 
       if (res.error) {
-        setErrorExpense(res.error);
+        setExpenseError(res.error);
       } else {
         setExpenseSuccess("Expense added");
         setAmount("");
@@ -237,12 +236,6 @@ export function ExpenseForm() {
               </p>
             )}
           </div>
-
-          {errorExpense && (
-            <p data-testid="error-expense" className="text-sm text-destructive">
-              {errorExpense}
-            </p>
-          )}
 
           {expenseSuccess && (
             <p data-testid="expense-success" className="text-sm text-green-600 font-medium">
